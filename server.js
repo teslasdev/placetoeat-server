@@ -15,7 +15,7 @@ dotenv.config();
 // const openai = new OpenAIApi(configuration);
 
 
-const PORT = process.env.DB_PORT || 2000;
+const PORT = process.env.PORT || 2000;
 // Connect to database
 const app = express()
 if (process.env.NODE_ENV === "development") {
