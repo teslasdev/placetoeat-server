@@ -34,7 +34,6 @@ const Role = db.roles;
 
 db.sequelize.sync()
   .then(() => {
-    initial();
     console.log("Connected db.");
   })
   .catch((err) => {
