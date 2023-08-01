@@ -47,7 +47,6 @@ app.get('/', async (req, res) => {
   res.status(200).send({
     message: 'Hello from CodeX!'
   })
-  console.log(process.env.OPENAI_API_KEY)
 })
 
 // Routes
@@ -107,8 +106,6 @@ function initial() {
 }
 app.post("/api/upload_files", multer({ storage: storage }).single('files'), uploadFiles);
 function uploadFiles(req, res) {
-    console.log(req.body);
-    console.log(req.files);
     res.json({ message: "Successfully uploaded files" });
 }
 
