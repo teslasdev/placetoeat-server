@@ -20,7 +20,7 @@ db.cities = require("../Model/city.model.js")(sequelize, Sequelize);
 db.auth = require("../Model/auth.model.js")(sequelize, Sequelize);
 db.roles = require("../Model/role.model.js")(sequelize, Sequelize);
 db.prompt = require("../Model/prompt.model.js")(sequelize, Sequelize);
-db.preference = require("../Model/preferenceS.model.js")(sequelize, Sequelize);
+db.preference = require("../Model/preferences.model.js")(sequelize, Sequelize);
 db.roles.belongsToMany(db.auth, {
   through: "user_roles"
 });
