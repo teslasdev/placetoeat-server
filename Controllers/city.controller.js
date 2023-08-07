@@ -7,24 +7,25 @@ exports.create = async (req, res) => {
    try {
       const  data  = req.body;
       const nameExist = await City.findOne({
-         where: {
+          where: {
             name: data.name
-         }
+          }
       })
       if(nameExist) {
-         return res.status(400).json({
+          return res.status(201).send({
             success: false,
             message:"City Name Exist"
-         });
-      }
+          });
+      } else {
       City.create(data)
-         .then(result => {
-           res.status(200).send({
-            data : result,
-            id : result.id
-           });
-         })
-   } catch(err) {
+        .then(result => {
+          res.status(200).send({
+           success : true,
+           message: "City Added Successfully"
+          });
+        })
+      }
+    } catch(err) {
       res.status(500).json({
         message: err.message || "Some error occurred while uploading the Post."
       });
@@ -115,17 +116,17 @@ exports.delete = (req, res) => {
    .then(num => {
       if (num == 1) {
         res.send({
-          message: "Post was deleted successfully!"
+          message: "City was deleted successfully!"
         });
       } else {
         res.send({
-          message: `Cannot delete Post with id=${id}. Maybe Post was not found!`
+          message: `Cannot delete City with id=${id}. Maybe Post was not found!`
         });
       }
    })
     .catch(err => {
       res.status(500).send({
-        message: "Could not delete Post with id=" + id
+        message: "Could not delete City with id=" + id
       });
    });
   
