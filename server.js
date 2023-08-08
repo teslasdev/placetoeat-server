@@ -36,7 +36,6 @@ const Prompt = db.prompt;
 const City = db.cities;
 db.sequelize.sync()
   .then(() => {
-    initial()
     console.log("Connected db.");
   })
   .catch((err) => {
