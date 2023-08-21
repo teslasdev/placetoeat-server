@@ -36,7 +36,6 @@ const Prompt = db.prompt;
 const City = db.cities;
 db.sequelize.sync()
   .then(() => {
-    initial();
     console.log("Connected db.");
   })
   .catch((err) => {
@@ -63,9 +62,9 @@ require('./routes/preferences.route.js')(app);
 require('./routes/prompt.route.js')(app);
 
 function initial() {
-  Prompt.create({
+  Role.create({
     id: 1,
-    prompt: ""
+    name: "Admin"
   });
 }
 
