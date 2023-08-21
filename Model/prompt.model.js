@@ -1,4 +1,4 @@
-module.exports = (sequelize, Sequelize) => {
+module.exports = (queryInterface,sequelize, Sequelize) => {
    const Prompt = sequelize.define("prompt", {
       id: {
        type: Sequelize.INTEGER,

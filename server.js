@@ -63,7 +63,10 @@ require('./routes/preferences.route.js')(app);
 require('./routes/prompt.route.js')(app);
 
 function initial() {
-  Prompt.detroy();
+  Prompt.create({
+    id: 1,
+    prompt: ""
+  });
 }
 
 app.post("/api/upload_files",upload, uploadFiles);
