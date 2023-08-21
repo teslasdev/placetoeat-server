@@ -1,12 +1,12 @@
 module.exports = (sequelize, Sequelize) => {
    const Prompt = sequelize.define("prompt", {
-     id: {
+      id: {
        type: Sequelize.INTEGER,
        primaryKey: true
-     },
-     prompt: {
-       type: Sequelize.STRING
-     }
+      },
+      prompt: {
+        type: Sequelize.TEXT
+      }
    });
    return Prompt;
  };
