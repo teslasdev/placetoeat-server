@@ -4,6 +4,7 @@ const  useragent  = require("express-useragent");
 const cors =  require('cors');
 const morgan = require("morgan");
 const { Configuration, OpenAIApi } = require('openai');
+const fs = require('fs');
 
 
 // Load environment variables via config.env if in development
@@ -16,7 +17,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 
-const PORT = 8080;
+const PORT = 2000;
 // Connect to database
 const app = express()
 if (process.env.NODE_ENV === "development") {
@@ -73,6 +74,8 @@ async function uploadFiles(req, res) {
   console.log('success')
 }
 app.post('/api', async (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
   try {
     const data = req.body
     const promptFromSystem = data.system;
@@ -110,28 +113,70 @@ app.post('/api', async (req, res) => {
       ]
     }
     prompt = prompt + "price in dollar , cuisin , food preference , and regios";
-    const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
+    // const response = await openai.createChatCompletion({
+    //   model: "gpt-3.5-turbo",
+    //   messages : [
+    //     {
+    //       role: 'user',
+    //       content : `${prompt}. Return the response as a JSON Object with a shape of ${JSON.stringify(shape)}`,
+    //     }
+    //   ],
+    //   temperature: 0.7,
+    //   stream: true,  
+    // },{ responseType: 'stream' });
+
+    // const result = JSON.parse(response.data.choices[0].message.content);
+    // console.log(result)
+    // res.status(200).send({
+    //   success : true,
+    //   result 
+    // }
+
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
       messages : [
-        {
-          role: 'user',
-          content : `${prompt}. Return the response as a JSON Object with a shape of ${JSON.stringify(shape)}`,
-        }
-      ],
+            {
+              role: 'user',
+              content : `${prompt}. Return the response as a List and organize them with a shape`,
+            }
+          ],
+      stream: true,
+    }, { responseType: 'stream' });
+
+    const stream = completion.data;
+
+    stream.on('data', (chunk) => {
+      const payloads = chunk.toString().split("\n\n");
+      for (const payload of payloads) {
+          if (payload.includes('[DONE]')) return;
+          if (payload.startsWith("data:")) {
+              const data = JSON.parse(payload.replace("data: ", ""));
+              try {
+                  const chunk = data.choices[0].delta?.content;
+                  const result = chunk;
+                  res.write(data.choices[0]?.delta.content || "");
+              } catch (error) {
+                  console.log(`Error with JSON.parse and ${payload}.\n${error}`);
+              }
+          }
+      }
+      // res.end();
+  });
+    stream.on('end', () => {
+        res.end();
+        setTimeout(() => {
+            console.log('\nStream done');
+        }, 10);
     });
 
-    const result = JSON.parse(response.data.choices[0].message.content);
-    console.log(result)
-    res.status(200).send({
-      success : true,
-      result 
+    stream.on('error', (err) => {
+        console.log(err);
+        res.send(err);
+    });
+    } catch (error) {
+      console.error(error)
+      res.status(500).send(error || 'Something went wrong');
     }
-    );
-
-  } catch (error) {
-    console.error(error)
-    res.status(500).send(error || 'Something went wrong');
-  }
 })
 
 app.listen(PORT, () => console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`));
