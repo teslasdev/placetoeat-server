@@ -17,7 +17,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 
-const PORT = 2000;
+const PORT = 8080;
 // Connect to database
 const app = express()
 if (process.env.NODE_ENV === "development") {
