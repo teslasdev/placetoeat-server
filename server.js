@@ -137,7 +137,7 @@ app.post('/api', async (req, res) => {
       messages : [
             {
               role: 'user',
-              content : `${prompt}. Return the response as a List and organize them with a shape`,
+              content : `${prompt}. Return the response as a JSON Object with a shape of ${JSON.stringify(shape)}`,
             }
           ],
       stream: true,
