@@ -137,14 +137,14 @@ app.post('/api', async (req, res) => {
       messages : [
             {
               role: 'user',
-              content : `${prompt}. Return the response as a JSON Object with a shape of ${JSON.stringify(shape)}`,
+              content : `${prompt}. Return an array of 5 JSON objects. Each object contains 8 keys - name , description,website, address,hotline ,region,price_in_dollar,preferences : [],region like eastern western south middle eastern south. Values are random words.  Return only the JSON array. Do not include any additional commentary in the response.`,
             }
           ],
       stream: true,
     }, { responseType: 'stream' });
 
     const stream = completion.data;
-
+    let result = '';
     stream.on('data', (chunk) => {
       const payloads = chunk.toString().split("\n\n");
       for (const payload of payloads) {
@@ -153,11 +153,24 @@ app.post('/api', async (req, res) => {
               const data = JSON.parse(payload.replace("data: ", ""));
               try {
                   const chunk = data.choices[0].delta?.content;
-                  const result = chunk;
-                  res.write(data.choices[0]?.delta.content || "");
+                  result += chunk // accumulate
+
+                  const endIndex = result.indexOf('}');
+                  if (endIndex !== -1) {
+                    const startIndex = result.indexOf('{');
+                    const jsonObject = result.slice(startIndex, endIndex + 1); // Extract the JSON object
+                    result = result.slice(endIndex + 1); // Remove the extracted JSON object from the accumulated data
+                    const parsedObject = JSON.parse(jsonObject);
+                    console.log(parsedObject); // Handle the parsed JSON object here
+                    res.write(jsonObject);
+                  }
+                  // const result = chunk;
+                  // console.log(`${chunk}`)
+                  // res.write(data.choices[0]?.delta.content || "");
               } catch (error) {
                   console.log(`Error with JSON.parse and ${payload}.\n${error}`);
               }
+              
           }
       }
       // res.end();
